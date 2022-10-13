@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:page_transition/page_transition.dart';
 import 'package:livraria/pages/livros/add_livros.dart';
-import 'package:livraria/pages/livros/livros_controller.dart';
+import 'package:livraria/models/livro_model.dart';
 import 'editar_livros.dart';
 
 class livros extends StatefulWidget {
@@ -15,11 +15,14 @@ class livros extends StatefulWidget {
 }
 
 class _livrosState extends State<livros> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool loadingLivros = true;
   final baseurl = 'livraria--back.herokuapp.com';
   final livrosData = <Livros>[];
   List <Livros> livrosListForSearch = [];
   final searchController = TextEditingController();
+  bool showDisponiveis = true;
+  bool showIndisponiveis = true;
 
   @override
   void initState() {
@@ -32,6 +35,7 @@ class _livrosState extends State<livros> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       body: loadingLivros
           ? Center(
               child: Container(
@@ -42,21 +46,30 @@ class _livrosState extends State<livros> {
                     color: Colors.black87,
                     backgroundColor: Colors.grey,
                   )))
-          :
-            Column(
+          : Column(
               children: [
-                Container(
-                  margin: const EdgeInsets.fromLTRB(9, 12, 9, 4),
-                  child: TextField(
-                    onChanged: searchLivro,
-                    controller: searchController,
-                    decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.search),
-                      hintText: 'Pesquisa',
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          borderSide: const BorderSide(color: Colors.black87)),
-                    ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 10, 2, 1),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          onChanged: searchLivro,
+                          controller: searchController,
+                          decoration: InputDecoration(
+                            prefixIcon: const Icon(Icons.search),
+                            hintText: 'Pesquisa',
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: const BorderSide(color: Colors.black87)),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: _openEndDrawer,
+                        icon: Icon(Icons.filter_list_outlined),
+                      ),
+                    ],
                   ),
                 ),
                 Expanded(
@@ -137,6 +150,31 @@ class _livrosState extends State<livros> {
           ),
               ],
             ),
+      endDrawer: Drawer(
+        child: Column(
+          children: [
+            DrawerHeader(
+              child: const Text('Filtros'),
+            ),
+            CheckboxListTile(
+              value: showDisponiveis,
+              onChanged: (v) {
+                showDisponiveis = v!;
+                searchLivro('');
+              },
+              title: const Text('Disponíveis'),
+            ),
+            CheckboxListTile(
+              value: showIndisponiveis,
+              onChanged: (v) {
+                showIndisponiveis = v!;
+                searchLivro('');
+              },
+              title: const Text('Indisponiveis'),
+            ),
+          ],
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Color(0xff306BAC),
         onPressed: () => Navigator.push(
@@ -164,7 +202,16 @@ class _livrosState extends State<livros> {
   }
 
   void searchLivro(String query) {
-    final suggestion = livrosData.where((itemLivrosList) {
+    var filteredData = livrosData;
+
+    if (!showDisponiveis) {
+      filteredData = filteredData.where((e) => !e.disponivel).toList();
+    }
+    if (!showIndisponiveis) {
+      filteredData = filteredData.where((e) => !e.indisponivel).toList();
+    }
+
+    filteredData = filteredData.where((itemLivrosList) {
       final itemProcurado = itemLivrosList.nome.toLowerCase() +
           itemLivrosList.autor.toLowerCase() +
           itemLivrosList.editora.nome.toLowerCase() +
@@ -174,6 +221,10 @@ class _livrosState extends State<livros> {
       return itemProcurado.contains(input);
     }).toList();
 
-    setState(() => livrosListForSearch = suggestion);
+    setState(() => livrosListForSearch = filteredData);
+  }
+
+  void _openEndDrawer() {
+    _scaffoldKey.currentState!.openEndDrawer();
   }
 }

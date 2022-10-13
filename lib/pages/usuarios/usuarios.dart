@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:livraria/pages/usuarios/usuarios_controller.dart';
+import 'package:livraria/models/usuario_model.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:page_transition/page_transition.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:livraria/pages/editoras/editoras_controller.dart';
+import 'package:livraria/models/editora_model.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:validatorless/validatorless.dart';

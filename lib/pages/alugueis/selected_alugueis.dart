@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:livraria/pages/alugueis/alugueis_controller.dart';
+import 'package:livraria/models/aluguel_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 

@@ -4,8 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:validatorless/validatorless.dart';
 import 'package:livraria/main.dart';
 
-import 'editoras.dart';
-
 class addEditoras extends StatefulWidget {
   const addEditoras({Key? key}) : super(key: key);
 

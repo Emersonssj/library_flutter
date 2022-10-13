@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:livraria/pages/editoras/editar_editoras.dart';
 import 'package:livraria/pages/editoras/add_editoras.dart';
-import 'package:livraria/pages/editoras/editoras_controller.dart';
+import 'package:livraria/models/editora_model.dart';
 import 'dart:convert';
 import 'package:page_transition/page_transition.dart';
 

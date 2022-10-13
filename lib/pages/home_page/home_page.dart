@@ -2,13 +2,13 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:livraria/pages/usuarios/usuarios_controller.dart';
-import 'package:livraria/pages/editoras/editoras_controller.dart';
-import 'package:livraria/pages/livros/livros_controller.dart';
-import 'package:livraria/pages/alugueis/alugueis_controller.dart';
+import 'package:livraria/models/usuario_model.dart';
+import 'package:livraria/models/editora_model.dart';
+import 'package:livraria/models/livro_model.dart';
+import 'package:livraria/models/aluguel_model.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-import 'maisAlugados_model.dart';
+import '../../models/maisAlugados_model.dart';
 
 class home_page extends StatefulWidget {
   const home_page({Key? key}) : super(key: key);
@@ -60,15 +60,16 @@ class _home_pageState extends State<home_page> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: OrientationBuilder(
-      builder: (BuildContext context, Orientation orientation) {
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(4.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
+    return Scaffold(
+        body: OrientationBuilder(
+          builder: (BuildContext context, Orientation orientation) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(4.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
                 children: [
                   gerarClipReact(
                     'https://www.gestaodacrise.com.br/wp-content/uploads/2020/12/todo-lider-precisar-ser-bom-leitor.jpg',

@@ -2,10 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:livraria/pages/editoras/editoras_controller.dart';
+import 'package:livraria/models/editora_model.dart';
 import 'package:validatorless/validatorless.dart';
-
 import '../../main.dart';
+import 'package:livraria/widgets/chamar_pesquisa_editora.dart';
 
 class addLivros extends StatefulWidget {
   const addLivros({Key? key}) : super(key: key);
@@ -16,24 +16,17 @@ class addLivros extends StatefulWidget {
 
 class _addLivrosState extends State<addLivros> {
   final _formKey = GlobalKey<FormState>();
+
+  late Editora selectedEditora;
   final editoras = <Editora>[];
-  late final List<String> items;
-  Editora? valueOfDropDownButton;
   bool flagEditora = false;
+
   final autorController = TextEditingController();
-  final editoraController = TextEditingController();
+  final controllerEditora = TextEditingController();
   final lancamentoController = TextEditingController();
   final nomeController = TextEditingController();
   final quantidadeController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    loadEditoras().then((value) {
-      setState(() {});
-      items = editoras.map((e) => e.nome).toList();
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,19 +85,24 @@ class _addLivrosState extends State<addLivros> {
                     labelText: "Quantidade", prefixIcon: Icon(Icons.edit)),
                 validator: Validatorless.required('Campo obrigatório'),
               ),
-              Container(
-                padding: EdgeInsets.only(top: 6),
-                child: DropdownButton<Editora>(
-                  hint: Text('Selecione a Editora'),
-                  menuMaxHeight: 250,
-                  isExpanded: true,
-                  iconSize: 30,
-                  value: valueOfDropDownButton,
-                  items: buildMenuItem(editoras),
-                  onChanged: (valueOfDropDownButton) => setState(() {
-                    this.valueOfDropDownButton = valueOfDropDownButton;
-                    flagEditora = true;
-                  }),
+              TextFormField(
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (_) => ChamarPesquisaEditora(
+                      whenEditoraSelected: (value) {
+                        flagEditora = true;
+                        controllerEditora.text = value.nome.toString();
+                        selectedEditora = value;
+                        Navigator.pop(context);
+                      },
+                    ),
+                  );
+                },
+                readOnly: true,
+                controller: controllerEditora,
+                decoration: InputDecoration(
+                    labelText: "Selecione a editora", prefixIcon: Icon(Icons.apartment_outlined),
                 ),
               ),
             ],
@@ -123,21 +121,16 @@ class _addLivrosState extends State<addLivros> {
     if (flagEditora == true) {
       var formValid = _formKey.currentState?.validate() ?? false;
       if (formValid) {
-        String autor = autorController.text;
-        String lancamento = lancamentoController.text;
-        String nome = nomeController.text;
-        String quantidade = quantidadeController.text;
-
         var uri = Uri.http('livraria--back.herokuapp.com', 'api/livro');
         try {
           final response = await http.post(
             uri,
             body: jsonEncode({
-              "autor": "$autor",
-              "editora": valueOfDropDownButton!.toMap(),
-              "lancamento": "$lancamento",
-              "nome": "$nome",
-              "quantidade": "$quantidade",
+              "autor": autorController.text,
+              "editora": selectedEditora.toMap(),
+              "lancamento": lancamentoController.text,
+              "nome": nomeController.text,
+              "quantidade": quantidadeController.text,
             }),
             headers: {'content-type': 'application/json'},
           );
@@ -147,7 +140,7 @@ class _addLivrosState extends State<addLivros> {
                 SnackBar(backgroundColor: Colors.red, content: Text('O nome já está sendo utilizado, use outro!')));
           }else{
             ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(backgroundColor:Colors.green, content: Text('O livro $nome foi criado!')));
+                SnackBar(backgroundColor:Colors.green, content: Text('O livro ${nomeController.text} foi criado!')));
             Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(
                     builder: (context) => MyHomePage(title: 'Livraria WDA',pageId: 3,)),
@@ -162,7 +155,7 @@ class _addLivrosState extends State<addLivros> {
       var formValid = _formKey.currentState?.validate() ?? false;
       if (formValid) {}
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Preencha a Editora!')));
+          .showSnackBar(SnackBar(content: Text('Selecione uma Editora!')));
     }
   }
 
